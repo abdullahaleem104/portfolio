@@ -1,0 +1,515 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>{% block title %}{% endblock %}</title>
+
+    <!-- Favicon - Browser Tab Logo -->
+    <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
+
+    <!-- Google Fonts for modern typography -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&display=swap"
+        rel="stylesheet">
+    <!-- Font Awesome 6 (free icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* ========== HEADER / NAVBAR (BLACK THEME) ========== */
+        .site-header {
+            background-color: #000000;
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        .navbar {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Logo / Brand with Image */
+        .logo a {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+            transition: transform 0.2s ease;
+        }
+
+        .logo a:hover {
+            transform: scale(1.02);
+        }
+
+        .logo-img {
+            width: clamp(35px, 8vw, 45px);
+            height: clamp(35px, 8vw, 45px);
+            border-radius: 0%;
+            object-fit: cover;
+            transition: all 0.3s ease;
+        }
+
+        .logo-img:hover {
+            transform: rotate(5deg);
+        }
+
+        .logo-text {
+            font-size: clamp(1.2rem, 5vw, 1.8rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        /* Navigation links container */
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+
+        .nav-links li a {
+            text-decoration: none;
+            font-weight: 600;
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+            color: #e2e8f0;
+            padding: 0.5rem 0;
+            position: relative;
+            transition: color 0.25s ease;
+            letter-spacing: -0.2px;
+            white-space: nowrap;
+        }
+
+        /* Hover effect with underline animation */
+        .nav-links li a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0%;
+            height: 2.5px;
+            background-color: #3b82f6;
+            border-radius: 4px;
+            transition: width 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        .nav-links li a:hover {
+            color: #ffffff;
+        }
+
+        .nav-links li a:hover::after {
+            width: 100%;
+        }
+
+        /* Mobile menu toggle */
+        .menu-toggle {
+            display: none;
+            font-size: 1.8rem;
+            color: white;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: color 0.2s;
+            padding: 0.5rem;
+        }
+
+        .menu-toggle:hover {
+            color: #3b82f6;
+        }
+
+        /* Main content area */
+        .main-content {
+            flex: 1;
+            max-width: 1280px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            width: 100%;
+        }
+
+        /* Footer */
+        .site-footer {
+            background-color: #000000;
+            color: #cbd5e1;
+            margin-top: auto;
+            width: 100%;
+            border-top: 1px solid #1e293b;
+        }
+
+        .footer-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem 2rem 1.8rem 2rem;
+        }
+
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 2.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: #cbd5e1;
+            font-size: clamp(0.8rem, 2.5vw, 0.95rem);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .contact-item i {
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            color: #3b82f6;
+            transition: all 0.3s ease;
+        }
+
+        .contact-item:hover {
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        .contact-item:hover i {
+            transform: scale(1.1);
+            color: #60a5fa;
+        }
+
+        .contact-link {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1.8rem;
+            flex-wrap: wrap;
+        }
+
+        .social-icons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #111827;
+            width: clamp(38px, 8vw, 44px);
+            height: clamp(38px, 8vw, 44px);
+            border-radius: 50%;
+            color: #e2e8f0;
+            font-size: clamp(1.2rem, 4vw, 1.6rem);
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.6, 1.1);
+            text-decoration: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .social-icons a:hover {
+            background-color: #3b82f6;
+            color: white;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 18px rgba(59, 130, 246, 0.4);
+        }
+
+        .social-icons a:hover i {
+            transform: scale(1.1);
+        }
+
+        .copyright {
+            text-align: center;
+            font-size: clamp(0.7rem, 2vw, 0.85rem);
+            color: #94a3b8;
+            border-top: 1px solid #1e293b;
+            padding-top: 1.5rem;
+            margin-top: 0.5rem;
+            letter-spacing: 0.3px;
+        }
+
+        /* ========== FULLY MOBILE RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0.9rem 1.5rem;
+                position: relative;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                background-color: #000000;
+                padding: 1.2rem 1rem;
+                margin-top: 1rem;
+                gap: 1.2rem;
+                border-radius: 20px;
+                border: 1px solid #1e293b;
+                box-shadow: 0 12px 20px rgba(0, 0, 0, 0.5);
+                position: absolute;
+                top: 100%;
+                left: 0;
+                z-index: 999;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links li a {
+                display: block;
+                padding: 0.6rem 0.5rem;
+                font-size: 1.1rem;
+                text-align: center;
+                white-space: normal;
+            }
+
+            .nav-links li a::after {
+                bottom: 2px;
+            }
+
+            .contact-info {
+                gap: 1.5rem;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .contact-item {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .social-icons {
+                gap: 1.5rem;
+            }
+        }
+
+        /* Small devices (phones) */
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 0 1rem;
+                margin: 1rem auto;
+            }
+
+            .footer-container {
+                padding: 1.5rem 1rem;
+            }
+
+            .contact-info {
+                gap: 1rem;
+            }
+
+            .contact-item {
+                font-size: 0.8rem;
+            }
+
+            .social-icons a {
+                width: 35px;
+                height: 35px;
+                font-size: 1.2rem;
+            }
+
+            .logo-text {
+                font-size: 1rem;
+            }
+
+            .logo-img {
+                width: 30px;
+                height: 30px;
+            }
+        }
+
+        /* Very small screens (320px) */
+        @media (max-width: 380px) {
+            .navbar {
+                padding: 0.7rem 1rem;
+            }
+
+            .logo-text {
+                display: none;
+                /* Hide text on very small screens, show only icon */
+            }
+
+            .menu-toggle {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Active page style */
+        .nav-links li a.active-page {
+            color: #ffffff;
+        }
+
+        .nav-links li a.active-page::after {
+            width: 100%;
+            background-color: #3b82f6;
+        }
+
+        @media (max-width: 480px) {
+            .desktop-only {
+                display: none;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+    <header class="site-header">
+        <div class="navbar">
+            <div class="logo">
+                <a href="/" title="Home">
+                    <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo-img">
+                    <span class="logo-text desktop-only"">Muhammad</span>
+                </a>
+            </div>
+            <button class=" menu-toggle" id="mobileMenuBtn" aria-label="Menu">
+                        <i class="fas fa-bars"></i>
+                        </button>
+                        <ul class="nav-links" id="navLinks">
+                            <li><a href="{% url 'index' %}">Home</a></li>
+                            <li><a href="{% url 'about' %}">About</a></li>
+                            <li><a href="{% url 'projects' %}">Projects</a></li>
+                            <li><a href="{% url 'skills' %}">Skills</a></li>
+                            <li><a href="{% url 'contact' %}">Contact</a></li>
+                        </ul>
+            </div>
+    </header>
+
+    <main class="main-content">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <!-- Contact Information Section -->
+            <div class="contact-info">
+                <div class="contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span class="contact-text">Faisalabad, Pakistan</span>
+                </div>
+                <div class="contact-item">
+                    <a href="mailto:abdullahaleem104@gmail.com" class="contact-link">
+                        <i class="fas fa-envelope"></i>
+                        <span class="contact-text">abdullahaleem104@gmail.com</span>
+                    </a>
+                </div>
+                <div class="contact-item">
+                    <a href="tel:+923101720914" class="contact-link">
+                        <i class="fas fa-phone-alt"></i>
+                        <span class="contact-text">+92 310 1720914</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Social Icons -->
+            <div class="social-icons">
+                <a href="https://www.facebook.com/profile.php?id=61560509938125" target="_blank" rel="noopener noreferrer"
+                    aria-label="Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="https://github.com/abdullahaleem104" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                    <i class="fab fa-github"></i>
+                </a>
+                <a href="https://www.linkedin.com/in/muhammad-abdullah-6129333a4/" target="_blank" rel="noopener noreferrer"
+                    aria-label="LinkedIn">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+            </div>
+
+            <!-- Copyright -->
+            <div class="copyright">
+                <i class="fas fa-copyright"></i>
+                2026 Muhammad Abdullah | Python Developer — All projects built with passion.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile menu toggle script -->
+    <script>
+        (function () {
+            const toggleBtn = document.getElementById('mobileMenuBtn');
+            const navLinks = document.getElementById('navLinks');
+
+            if (toggleBtn && navLinks) {
+                toggleBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    navLinks.classList.toggle('active');
+                    const icon = toggleBtn.querySelector('i');
+                    if (navLinks.classList.contains('active')) {
+                        icon.classList.remove('fa-bars');
+                        icon.classList.add('fa-times');
+                    } else {
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                    }
+                });
+
+                // Close mobile menu when clicking on a link
+                const allLinks = navLinks.querySelectorAll('a');
+                allLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                        if (window.innerWidth <= 768) {
+                            navLinks.classList.remove('active');
+                            const icon = toggleBtn.querySelector('i');
+                            if (icon) {
+                                icon.classList.remove('fa-times');
+                                icon.classList.add('fa-bars');
+                            }
+                        }
+                    });
+                });
+
+                // Close menu when resizing to desktop
+                window.addEventListener('resize', function () {
+                    if (window.innerWidth > 768) {
+                        navLinks.classList.remove('active');
+                        const icon = toggleBtn.querySelector('i');
+                        if (icon) {
+                            icon.classList.remove('fa-times');
+                            icon.classList.add('fa-bars');
+                        }
+                    }
+                });
+            }
+        })();
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

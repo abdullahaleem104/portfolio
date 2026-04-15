@@ -1,0 +1,722 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Projects | Muhammad - Python Developer{% endblock %}
+
+{% block content %}
+<!-- Font Awesome 6 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<style>
+    /* Reset & base styles */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    /* Hero Section */
+    .projects-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 4vw, 2rem);
+        text-align: center;
+        border-radius: clamp(15px, 4vw, 30px);
+        margin-bottom: clamp(1.5rem, 4vw, 3rem);
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    .projects-hero-content h1 {
+        font-size: clamp(1.8rem, 6vw, 3rem);
+        margin-bottom: clamp(0.5rem, 2vw, 1rem);
+        color: white;
+    }
+
+    .projects-hero-content .highlight {
+        color: #fbbf24;
+    }
+
+    .projects-hero-content p {
+        color: #e2e8f0;
+        font-size: clamp(0.9rem, 3vw, 1.2rem);
+    }
+
+    /* Section Headers */
+    .section-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2rem;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 0.75rem;
+    }
+
+    .section-header i {
+        font-size: clamp(1.5rem, 5vw, 2rem);
+        margin-right: 1rem;
+        color: #667eea;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .section-header h2 {
+        font-size: clamp(1.5rem, 5vw, 2.2rem);
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+    }
+
+    /* Projects list section */
+    .projects-list-section {
+        margin-bottom: clamp(1.5rem, 4vw, 3rem);
+    }
+
+    .projects-container {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* Project card - redesigned without image section */
+    .project-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        animation: fadeInUp 0.6s ease-out;
+        display: flex;
+        flex-direction: column;
+        border-left: 6px solid #667eea;
+    }
+
+    .project-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        border-left-color: #7501f9;
+    }
+
+    .project-card:hover .project-features li i {
+        color: #fbbf24;
+    }
+
+
+    /* Info section - full width now */
+    .project-info-section {
+        padding: clamp(1.2rem, 4vw, 2rem);
+        width: 100%;
+    }
+
+    .project-info-section h2 {
+        font-size: clamp(1.3rem, 4vw, 1.8rem);
+        margin-bottom: 0.8rem;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .project-badge {
+        font-size: 0.75rem;
+        background: #e0e7ff;
+        color: #4338ca;
+        padding: 0.2rem 0.8rem;
+        border-radius: 20px;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+    }
+
+    .project-description {
+        color: #64748b;
+        line-height: 1.7;
+        margin-bottom: 1.2rem;
+        font-size: clamp(0.85rem, 2.5vw, 1rem);
+    }
+
+    .project-tech {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1.2rem;
+    }
+
+    .project-tech span {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 0.3rem 0.9rem;
+        border-radius: 20px;
+        font-size: clamp(0.7rem, 2vw, 0.8rem);
+        color: #ffffff;
+        font-weight: 500;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+
+    .project-tech span:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .project-features {
+        margin-bottom: 0.5rem;
+    }
+
+    .project-features h4 {
+        font-size: clamp(0.9rem, 3vw, 1rem);
+        margin-bottom: 0.8rem;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .project-features h4 i {
+        color: #3b82f6;
+        font-size: 0.9rem;
+    }
+
+    .project-features ul {
+        list-style: none;
+        padding-left: 0;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.6rem;
+    }
+
+    @media (min-width: 480px) {
+        .project-features ul {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .project-features li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.6rem;
+        color: #334155;
+        font-size: clamp(0.8rem, 2.5vw, 0.95rem);
+    }
+
+    .project-features li i {
+        color: #3b82f6;
+        font-size: 0.8rem;
+        margin-top: 0.2rem;
+    }
+
+    .project-links {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 1.5rem;
+    }
+
+    .project-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1.2rem;
+        background: #3b82f6;
+        color: white;
+        text-decoration: none;
+        border-radius: 30px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .project-link:hover {
+        background: #2563eb;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(37, 99, 235, 0.3);
+    }
+
+    /* Empty state for sections */
+    .empty-section-message {
+        text-align: center;
+        padding: 2rem;
+        background: #f8fafc;
+        border-radius: 16px;
+        color: #64748b;
+        font-style: italic;
+    }
+
+    /* CTA Section */
+    .cta-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: clamp(1.5rem, 5vw, 3rem) clamp(1rem, 4vw, 2rem);
+        text-align: center;
+        border-radius: clamp(15px, 4vw, 30px);
+        margin: 0 0 2rem 0;
+    }
+
+    .cta-content h2 {
+        color: white;
+        font-size: clamp(1.3rem, 5vw, 2rem);
+        margin-bottom: clamp(0.5rem, 2vw, 1rem);
+    }
+
+    .cta-content .highlight {
+        color: #fbbf24;
+    }
+
+    .cta-content p {
+        color: #e2e8f0;
+        margin-bottom: clamp(1rem, 3vw, 1.5rem);
+        font-size: clamp(0.85rem, 2.5vw, 1rem);
+    }
+
+    .cta-section .btn-primary {
+        background: white;
+        color: #667eea;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: clamp(0.6rem, 2vw, 0.8rem) clamp(1rem, 4vw, 1.8rem);
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .cta-section .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (hover: none) {
+        .project-card:hover {
+            transform: none;
+        }
+    }
+</style>
+
+<div class="container">
+    <!-- Hero Section -->
+    <section class="projects-hero">
+        <div class="projects-hero-content">
+            <h1>My <span class="highlight">Projects</span></h1>
+            <p>Explore my work - from web applications to desktop tools and AI experiments</p>
+        </div>
+    </section>
+
+    <!-- OFFICE PROJECTS SECTION -->
+    <section class="projects-list-section">
+        <div class="section-header">
+            <i class="fas fa-briefcase"></i>
+            <h2>Office Projects</h2>
+        </div>
+        <div class="projects-container">
+
+            <!-- Office Project 1 - Cloth Aura -->
+            <div class="project-card">
+                <div class="project-info-section">
+                    <h2>
+                        Cloth Aura – Women’s Fashion Store (In Progress)
+                        <span class="project-badge"><i class="fas fa-building"></i> Professional</span>
+                    </h2>
+                    <p class="project-description">
+                        A modern Django-based fashion e-commerce website focused on women’s clothing with a stylish and
+                        user-friendly interface. The project is still under development and aims to provide a smooth
+                        shopping experience with visually appealing product presentation. It is being designed with
+                        scalability and future features in mind.
+                    </p>
+                    <div class="project-tech">
+                        <span>Django</span>
+                        <span>JavaScript</span>
+                        <span>Bootstrap</span>
+                        <span>SQLite</span>
+                    </div>
+                    <div class="project-features">
+                        <h4><i class="fas fa-star"></i> Key Features:</h4>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Advanced product search</li>
+                            <li><i class="fas fa-check-circle"></i> Clothing categories and product display</li>
+                            <li><i class="fas fa-check-circle"></i> Wishlist & cart system (planned)</li>
+                            <li><i class="fas fa-check-circle"></i> Responsive UI design</li>
+                            <li><i class="fas fa-check-circle"></i> Admin management panel</li>
+                        </ul>
+                    </div>
+                    <div class="project-links">
+                        <!-- <a href="#" class="project-link"><i class="fab fa-github"></i> View Code</a> -->
+                        <a href="https://www.clothaura.store/" class="project-link">Live Demo <i
+                                class="fas fa-external-link-alt"></i></a>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Office Project 2 - Tire Depot -->
+            <div class="project-card">
+                <div class="project-info-section">
+                    <h2>
+                        Tire Depot – E-Commerce Tire Platform
+                        <span class="project-badge"><i class="fas fa-building"></i> Professional</span>
+                    </h2>
+                    <p class="project-description">
+                        A Django-based e-commerce platform designed for browsing and exploring different tire brands
+                        with a smooth user experience. The system focuses on helping customers easily compare products
+                        and view detailed information before making a choice. It provides a structured and organized
+                        product catalog for better usability.
+                    </p>
+                    <div class="project-tech">
+                        <span>Django</span>
+                        <span>HTML/CSS</span>
+                        <span>Bootstrap</span>
+                        <span>JavaScript</span>
+                        <span>SQLite</span>
+                    </div>
+                    <div class="project-features">
+                        <h4><i class="fas fa-star"></i> Key Features:</h4>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Product listing with categories</li>
+                            <li><i class="fas fa-check-circle"></i> Brand-based filtering</li>
+                            <li><i class="fas fa-check-circle"></i> Clean user interface for customers</li>
+                            <li><i class="fas fa-check-circle"></i> Basic e-commerce flow (browse → select → view
+                                details)</li>
+                        </ul>
+                    </div>
+                    <div class="project-links">
+                        <!-- <a href="#" class="project-link"><i class="fab fa-github"></i> View Code</a> -->
+                        <a href="http://www.santarosatires.com/" class="project-link">Live Demo <i
+                                class="fas fa-external-link-alt"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Office Project 3 - Superstar Worldwide Limo Website (Client Work) -->
+            <div class="project-card">
+                <div class="project-info-section">
+                    <h2>
+                        Superstar Worldwide Limo Website (Client Work)
+                        <span class="project-badge"><i class="fas fa-building"></i> Professional</span>
+                    </h2>
+                    <p class="project-description">
+                        A limousine booking platform developed based on client requirements and continuous feedback. The
+                        system allows users to explore services and make booking-related interactions in a structured
+                        way. The project was improved iteratively based on real client needs and usability adjustments.
+                    </p>
+                    <div class="project-tech">
+                        <span>Django</span>
+                        <span>HTML/CSS</span>
+                        <span>Bootstrap</span>
+                        <span>JavaScript</span>
+                    </div>
+                    <div class="project-features">
+                        <h4><i class="fas fa-star"></i> Key Features:</h4>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Car booking system</li>
+                            <li><i class="fas fa-check-circle"></i> Service listing pages</li>
+                            <li><i class="fas fa-check-circle"></i> Client feedback-based updates</li>
+                            <li><i class="fas fa-check-circle"></i> Basic reservation flow</li>
+                        </ul>
+                    </div>
+                    <div class="project-links">
+                        <!-- <a href="#" class="project-link"><i class="fab fa-github"></i> View Code</a> -->
+                        <a href="https://www.superstarworldwidelimousine.com/" class="project-link">Live Demo <i
+                                class="fas fa-external-link-alt"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Office Project 3 - AI Medical Client Model (China Collaboration) -->
+            <div class="project-card">
+                <div class="project-info-section">
+                    <h2>
+                        AI Medical Client Model (Remote Work)
+                        <span class="project-badge"><i class="fas fa-building"></i> Professional</span>
+                    </h2>
+                    <p class="project-description">
+                        A machine learning model developed remotely for medical domain use cases such as prediction and
+                        data analysis. It involves preprocessing large datasets and training models for
+                        healthcare-related insights. The project was built through collaboration using remote tools and
+                        structured data pipelines.
+                    </p>
+                    <div class="project-tech">
+                        <span>Python</span>
+                        <span>PyTorch</span>
+                        <span>NumPy</span>
+                        <span>Matplotlib</span>
+                        <span>Seaborn</span>
+                        <span>TeamViewer</span>
+                    </div>
+                    <div class="project-features">
+                        <h4><i class="fas fa-star"></i> Key Features:</h4>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Medical data processing pipeline</li>
+                            <li><i class="fas fa-check-circle"></i> Model training and testing</li>
+                            <li><i class="fas fa-check-circle"></i> Data cleaning and preprocessing</li>
+                            <li><i class="fas fa-check-circle"></i> Remote collaboration workflow</li>
+                        </ul>
+                    </div>
+                    <!-- <div class="project-links">
+                         <a href="#" class="project-link"><i class="fab fa-github"></i> View Code</a> 
+                        <a href="https://www.superstarworldwidelimousine.com/" class="project-link">Live Demo <i
+                                class="fas fa-external-link-alt"></i></a>
+                    </div> -->
+                </div>
+            </div>
+
+
+            <!-- Office Project 3 - AI Cloth Changer (Remote/Colab Project) -->
+            <div class="project-card">
+                <div class="project-info-section">
+                    <h2>
+                        AI Cloth Changer (Remote/Colab Project)
+                        <span class="project-badge"><i class="fas fa-building"></i> Professional</span>
+                    </h2>
+                    <p class="project-description">
+                        An AI-based image processing system that replaces clothing in images using deep learning
+                        techniques. It works by taking two images and intelligently mapping clothing styles onto a
+                        target person. The project was executed on Google Colab for remote processing and
+                        experimentation with AI models.
+                    </p>
+                    <div class="project-tech">
+                        <span>Python</span>
+                        <span>Jupyter Notebook</span>
+                        <span>Google Colab</span>
+                        <span>Quick Assist</span>
+                    </div>
+                    <div class="project-features">
+                        <h4><i class="fas fa-star"></i> Key Features:</h4>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Virtual clothing swap using AI</li>
+                            <li><i class="fas fa-check-circle"></i> Image preprocessing pipeline</li>
+                            <li><i class="fas fa-check-circle"></i> Cloud execution support (Google Colab)</li>
+                            <li><i class="fas fa-check-circle"></i> Handles input/output image mapping</li>
+                        </ul>
+                    </div>
+                    <!-- <div class="project-links">
+                         <a href="#" class="project-link"><i class="fab fa-github"></i> View Code</a> 
+                        <a href="https://www.superstarworldwidelimousine.com/" class="project-link">Live Demo <i
+                                class="fas fa-external-link-alt"></i></a>
+                    </div> -->
+                </div>
+            </div>
+
+            <!-- Office Project 3 - Hardware Shop Management System -->
+            <div class="project-card">
+                <div class="project-info-section">
+                    <h2>
+                        Hardware Shop Management System
+                        <span class="project-badge"><i class="fas fa-building"></i> Professional</span>
+                    </h2>
+                    <p class="project-description">
+                        A desktop application built to manage hardware store operations including inventory, sales, and
+                        stock tracking. It is designed to help shop owners maintain accurate records of tools and
+                        materials in real time. The system improves efficiency by reducing manual bookkeeping and
+                        organizing all data in a structured database.
+                    </p>
+                    <div class="project-tech">
+                        <span>Python</span>
+                        <span>PyQt5</span>
+                        <span>SQL Server</span>
+                    </div>
+                    <div class="project-features">
+                        <h4><i class="fas fa-star"></i> Key Features:</h4>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Inventory management system</li>
+                            <li><i class="fas fa-check-circle"></i> Sales and billing records</li>
+                            <li><i class="fas fa-check-circle"></i> Stock tracking for tools & items</li>
+                            <li><i class="fas fa-check-circle"></i> Database-driven operations</li>
+                        </ul>
+                    </div>
+                    <!-- <div class="project-links">
+                         <a href="#" class="project-link"><i class="fab fa-github"></i> View Code</a> 
+                        <a href="https://www.superstarworldwidelimousine.com/" class="project-link">Live Demo <i
+                                class="fas fa-external-link-alt"></i></a>
+                    </div> -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PERSONAL PROJECTS SECTION -->
+    <section class="projects-list-section">
+        <div class="section-header">
+            <i class="fas fa-laptop-code"></i>
+            <h2>Personal / Learning Projects</h2>
+        </div>
+        <div class="projects-container">
+
+            <!-- Personal Project 1 - Space Shooter Game -->
+            <div class="project-card">
+                <div class="project-info-section">
+                    <h2>
+                        Space Shooter Game
+                        <span class="project-badge"><i class="fas fa-user"></i> Personal</span>
+                    </h2>
+                    <p class="project-description">
+                        A simple arcade-style shooting game built for practice and entertainment purposes. It focuses on
+                        real-time gameplay mechanics like movement, shooting, and enemy spawning. The project helped
+                        strengthen logic building and game development fundamentals.
+                    </p>
+                    <div class="project-tech">
+                        <span>Python</span>
+                        <span>PyGame</span>
+                    </div>
+                    <div class="project-features">
+                        <h4><i class="fas fa-star"></i> Key Features:</h4>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Enemy AI with movement patterns</li>
+                            <li><i class="fas fa-check-circle"></i> Boss battles at each level</li>
+                            <li><i class="fas fa-check-circle"></i> High score tracking system</li>
+                            <li><i class="fas fa-check-circle"></i> Pause/Resume functionality</li>
+                            <li><i class="fas fa-check-circle"></i> Smooth animations & sound effects</li>
+                        </ul>
+                    </div>
+                    <!-- <div class="project-links">
+                         <a href="#" class="project-link"><i class="fab fa-github"></i> View Code</a> 
+                        <a href="https://www.superstarworldwidelimousine.com/" class="project-link">Live Demo <i
+                                class="fas fa-external-link-alt"></i></a>
+                    </div> -->
+                </div>
+            </div>
+
+            <!-- Personal Project 2 - School Management System -->
+            <div class="project-card">
+                <div class="project-info-section">
+                    <h2>
+                        School Management System
+                        <span class="project-badge"><i class="fas fa-user"></i> Personal</span>
+                    </h2>
+                    <p class="project-description">
+                        A desktop-based management system developed to handle daily school operations in an organized
+                        and efficient manner. The application manages student records, classes, fees, attendance,
+                        teachers, and teacher salary data while streamlining administrative tasks through a structured
+                        database system.
+                    </p>
+                    <div class="project-tech">
+                        <span>Python</span>
+                        <span>PyQt5</span>
+                        <span>SQL Server</span>
+                    </div>
+                    <div class="project-features">
+                        <h4><i class="fas fa-star"></i> Key Features:</h4>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Student record management</li>
+                            <li><i class="fas fa-check-circle"></i> Teacher data handling</li>
+                            <li><i class="fas fa-check-circle"></i> Attendance tracking system</li>
+                            <li><i class="fas fa-check-circle"></i> Fee management system</li>
+                            <li><i class="fas fa-check-circle"></i> Salary management for teachers</li>
+                            <li><i class="fas fa-check-circle"></i> Class scheduling system</li>
+                        </ul>
+                    </div>
+                    <!-- <div class="project-links">
+                         <a href="#" class="project-link"><i class="fab fa-github"></i> View Code</a> 
+                        <a href="https://www.superstarworldwidelimousine.com/" class="project-link">Live Demo <i
+                                class="fas fa-external-link-alt"></i></a>
+                    </div> -->
+                </div>
+            </div>
+
+            <!-- Personal Project 3 - Recipe Hub Web -->
+            <div class="project-card">
+                <div class="project-info-section">
+                    <h2>
+                        Recipe Hub Web
+                        <span class="project-badge"><i class="fas fa-user"></i> Personal</span>
+                    </h2>
+                    <p class="project-description">
+                        A Django-based recipe platform where users can explore and discover different meals and
+                        cuisines. It provides categorized recipes with a clean and simple browsing experience. The
+                        project was built for learning web development and practicing backend logic.
+                    <div class="project-tech">
+                        <span>Django</span>
+                        <span>HTML/CSS</span>
+                        <span>Bootstrap</span>
+                        <span>JavaScript</span>
+                    </div>
+                    <div class="project-features">
+                        <h4><i class="fas fa-star"></i> Key Features:</h4>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Recipe browsing system</li>
+                            <li><i class="fas fa-check-circle"></i> Category-wise meals</li>
+                            <li><i class="fas fa-check-circle"></i> Search functionality</li>
+                            <li><i class="fas fa-check-circle"></i> Clean UI for users</li>
+                        </ul>
+                    </div>
+                    <!-- <div class="project-links">
+                         <a href="#" class="project-link"><i class="fab fa-github"></i> View Code</a> 
+                        <a href="https://www.superstarworldwidelimousine.com/" class="project-link">Live Demo <i
+                                class="fas fa-external-link-alt"></i></a>
+                    </div> -->
+                </div>
+            </div>
+
+            <!-- Personal Project 3 - Employee Tracker System -->
+            <div class="project-card">
+                <div class="project-info-section">
+                    <h2>
+                        Employee Tracker System
+                        <span class="project-badge"><i class="fas fa-user"></i> Personal</span>
+                    </h2>
+                    <p class="project-description">
+                        A background-based employee monitoring system developed using computer vision and system
+                        activity tracking. The application runs automatically on system startup and monitors user
+                        interaction such as keyboard and mouse activity. It is designed to analyze productivity patterns
+                        and detect inactivity in real time.
+                    </p>
+                    <div class="project-tech">
+                        <span>Python</span>
+                        <span>OpenCV</span>
+                    </div>
+                    <div class="project-features">
+                        <h4><i class="fas fa-star"></i> Key Features:</h4>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Tracks keyboard and mouse activity</li>
+                            <li><i class="fas fa-check-circle"></i> Sends warning notification after inactivity
+                                threshold</li>
+                            <li><i class="fas fa-check-circle"></i> Detects user inactivity with a timed loop system
+                            </li>
+                            <li><i class="fas fa-check-circle"></i> Automatically captures system screenshot for
+                                reporting</li>
+
+                        </ul>
+                    </div>
+                    <!-- <div class="project-links">
+                         <a href="#" class="project-link"><i class="fab fa-github"></i> View Code</a> 
+                        <a href="https://www.superstarworldwidelimousine.com/" class="project-link">Live Demo <i
+                                class="fas fa-external-link-alt"></i></a>
+                    </div> -->
+                </div>
+            </div>
+
+
+
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="cta-section">
+        <div class="cta-content">
+            <h2>Ready to Build Something <span class="highlight">Amazing</span>?</h2>
+            <p>Let's collaborate and turn your vision into reality with cutting-edge technology</p>
+            <a href="{% url 'contact' %}" class="btn-primary">
+                <i class="fas fa-paper-plane"></i> Start a Project
+            </a>
+        </div>
+    </section>
+</div>
+
+<!-- No slider JavaScript needed anymore -->
+{% endblock %}

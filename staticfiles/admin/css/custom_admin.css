@@ -1,0 +1,12 @@
+/* static/admin/css/custom_admin.css */
+/* Make password field more visible */
+input[type="password"] {
+    font-family: monospace !important;
+    font-size: 16px !important;
+    letter-spacing: 2px !important;
+}
+
+/* Add a hint that browser has show/hide feature */
+input[type="password"]::after {
+    content: "🔒";
+}
