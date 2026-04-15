@@ -40,53 +40,36 @@ def send_email_notification(name, email, subject, message):
     try:
         api_key = settings.RESEND_API_KEY
         
+        # Debug: Check if API key exists
         if not api_key:
-            print("ERROR: RESEND_API_KEY is not configured")
+            print("❌ RESEND_API_KEY is not set in settings!")
             return False
+        else:
+            print(f"✅ RESEND_API_KEY found (length: {len(api_key)})")
+            print(f"API Key starts with: {api_key[:10]}...")
         
         headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"
         }
         
+        # Create a simpler email first for testing
+        email_body = f"""
+Name: {name}
+Email: {email}
+Subject: {subject}
+Message: {message}
+        """
+        
         data = {
             "from": "onboarding@resend.dev",
-            "to": ["abdullahaleem104@gmail.com"],
+            "to": ["abdullahaleem104@gmail.com"],  # Your Resend account email
             "subject": f"New Message from Portfolio: {subject}",
-            "html": f"""
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <style>
-                        body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
-                        .container {{ max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; }}
-                        .header {{ background-color: #4CAF50; color: white; padding: 10px; text-align: center; border-radius: 5px; }}
-                        .content {{ padding: 20px; }}
-                        .field {{ margin-bottom: 15px; }}
-                        .label {{ font-weight: bold; color: #4CAF50; }}
-                        .message {{ background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-top: 10px; }}
-                        .footer {{ text-align: center; margin-top: 20px; font-size: 12px; color: #777; }}
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <div class="header"><h2>📬 New Contact Form Message</h2></div>
-                        <div class="content">
-                            <div class="field"><span class="label">👤 Name:</span> {name}</div>
-                            <div class="field"><span class="label">📧 Email:</span> <a href="mailto:{email}">{email}</a></div>
-                            <div class="field"><span class="label">📋 Subject:</span> {subject}</div>
-                            <div class="field"><span class="label">💬 Message:</span>
-                            <div class="message">{message}</div></div>
-                        </div>
-                        <div class="footer">
-                            <p>This message was sent from your portfolio website contact form.</p>
-                            <p>You can reply directly to: {email}</p>
-                        </div>
-                    </div>
-                </body>
-                </html>
-            """
+            "text": email_body,  # Use plain text first for testing
         }
+        
+        print(f"📧 Attempting to send email to: abdullahaleem104@gmail.com")
+        print(f"📧 From: onboarding@resend.dev")
         
         response = requests.post(
             "https://api.resend.com/emails",
@@ -95,13 +78,27 @@ def send_email_notification(name, email, subject, message):
             timeout=30
         )
         
-        print(f"RESEND STATUS: {response.status_code}")
-        print(f"RESEND RESPONSE: {response.text}")
+        print(f"📡 Resend Response Status: {response.status_code}")
+        print(f"📡 Resend Response Body: {response.text}")
         
-        return response.status_code == 200
+        if response.status_code == 200:
+            print("✅ Email sent successfully!")
+            return True
+        else:
+            print(f"❌ Resend API error: {response.status_code}")
+            print(f"Error details: {response.text}")
+            return False
 
+    except requests.exceptions.Timeout:
+        print("❌ Resend API timeout - request took too long")
+        return False
+    except requests.exceptions.ConnectionError as e:
+        print(f"❌ Connection error to Resend: {e}")
+        return False
     except Exception as e:
-        print(f"RESEND ERROR: {e}")
+        print(f"❌ Unexpected error: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return False
 
 def send_whatsapp_notification(name, email, subject, message):
