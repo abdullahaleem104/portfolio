@@ -134,7 +134,11 @@ def contact(request):
             )
             
             # 2. Send Email
-            email_sent = send_email_notification(name, email, subject, message)
+            try:
+                  email_sent = send_email_notification(name, email, subject, message)
+            except Exception as e:
+                  print("Email skipped:", e)
+                  email_sent = False
             
             # 3. Send WhatsApp Notification
             whatsapp_sent = send_whatsapp_notification(name, email, subject, message)
