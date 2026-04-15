@@ -7,7 +7,7 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 import requests
-import resend
+# import resend  ← REMOVED THIS LINE - not needed
 from .models import Project, ContactMessage
 
 def home(request):
@@ -35,13 +35,14 @@ def get_client_ip(request):
         ip = request.META.get('REMOTE_ADDR')
     return ip
 
-import socket
-import requests
-
 def send_email_notification(name, email, subject, message):
-    """Send email notification using Resend"""
+    """Send email notification using Resend API"""
     try:
         api_key = settings.RESEND_API_KEY
+        
+        if not api_key:
+            print("ERROR: RESEND_API_KEY is not configured")
+            return False
         
         headers = {
             "Authorization": f"Bearer {api_key}",
@@ -50,75 +51,32 @@ def send_email_notification(name, email, subject, message):
         
         data = {
             "from": "onboarding@resend.dev",
-            "to": ["abdullahaleem104@gmail.com"],  # ✅ Changed to your Resend email
+            "to": ["abdullahaleem104@gmail.com"],
             "subject": f"New Message from Portfolio: {subject}",
             "html": f"""
                 <!DOCTYPE html>
                 <html>
                 <head>
                     <style>
-                        body {{
-                            font-family: Arial, sans-serif;
-                            line-height: 1.6;
-                            color: #333;
-                        }}
-                        .container {{
-                            max-width: 600px;
-                            margin: 0 auto;
-                            padding: 20px;
-                            border: 1px solid #ddd;
-                            border-radius: 10px;
-                        }}
-                        .header {{
-                            background-color: #4CAF50;
-                            color: white;
-                            padding: 10px;
-                            text-align: center;
-                            border-radius: 5px;
-                        }}
-                        .content {{
-                            padding: 20px;
-                        }}
-                        .field {{
-                            margin-bottom: 15px;
-                        }}
-                        .label {{
-                            font-weight: bold;
-                            color: #4CAF50;
-                        }}
-                        .message {{
-                            background-color: #f9f9f9;
-                            padding: 15px;
-                            border-radius: 5px;
-                            margin-top: 10px;
-                        }}
-                        .footer {{
-                            text-align: center;
-                            margin-top: 20px;
-                            font-size: 12px;
-                            color: #777;
-                        }}
+                        body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                        .container {{ max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; }}
+                        .header {{ background-color: #4CAF50; color: white; padding: 10px; text-align: center; border-radius: 5px; }}
+                        .content {{ padding: 20px; }}
+                        .field {{ margin-bottom: 15px; }}
+                        .label {{ font-weight: bold; color: #4CAF50; }}
+                        .message {{ background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-top: 10px; }}
+                        .footer {{ text-align: center; margin-top: 20px; font-size: 12px; color: #777; }}
                     </style>
                 </head>
                 <body>
                     <div class="container">
-                        <div class="header">
-                            <h2>📬 New Contact Form Message</h2>
-                        </div>
+                        <div class="header"><h2>📬 New Contact Form Message</h2></div>
                         <div class="content">
-                            <div class="field">
-                                <span class="label">👤 Name:</span> {name}
-                            </div>
-                            <div class="field">
-                                <span class="label">📧 Email:</span> <a href="mailto:{email}">{email}</a>
-                            </div>
-                            <div class="field">
-                                <span class="label">📋 Subject:</span> {subject}
-                            </div>
-                            <div class="field">
-                                <span class="label">💬 Message:</span>
-                                <div class="message">{message}</div>
-                            </div>
+                            <div class="field"><span class="label">👤 Name:</span> {name}</div>
+                            <div class="field"><span class="label">📧 Email:</span> <a href="mailto:{email}">{email}</a></div>
+                            <div class="field"><span class="label">📋 Subject:</span> {subject}</div>
+                            <div class="field"><span class="label">💬 Message:</span>
+                            <div class="message">{message}</div></div>
                         </div>
                         <div class="footer">
                             <p>This message was sent from your portfolio website contact form.</p>
@@ -140,16 +98,12 @@ def send_email_notification(name, email, subject, message):
         print(f"RESEND STATUS: {response.status_code}")
         print(f"RESEND RESPONSE: {response.text}")
         
-        if response.status_code == 200:
-            return True
-        else:
-            print(f"Resend error: {response.text}")
-            return False
+        return response.status_code == 200
 
     except Exception as e:
         print(f"RESEND ERROR: {e}")
         return False
-    
+
 def send_whatsapp_notification(name, email, subject, message):
     """Send WhatsApp notification using CallMeBot API"""
     try:
@@ -157,7 +111,6 @@ def send_whatsapp_notification(name, email, subject, message):
         phone_number = getattr(settings, 'WHATSAPP_PHONE_NUMBER', None)
         
         if whatsapp_api_key and phone_number:
-            # Prepare message (URL encode)
             import urllib.parse
             whatsapp_msg = f"""🔔 NEW CONTACT FORM MESSAGE!
 
@@ -170,7 +123,6 @@ def send_whatsapp_notification(name, email, subject, message):
             url = f"https://api.callmebot.com/whatsapp.php?phone={phone_number}&text={encoded_msg}&apikey={whatsapp_api_key}"
             
             response = requests.get(url, timeout=10)
-            print(f"WhatsApp response: {response.status_code}")
             return response.status_code == 200
         
         return False
@@ -234,8 +186,8 @@ def contact(request):
             return redirect('contact')
             
         except Exception as e:
-            messages.error(request, f'An error occurred. Please try again later.')
             print(f"Contact form error: {e}")
+            messages.error(request, 'An error occurred. Please try again later.')
             return render(request, 'portfolio/contact.html')
     
     return render(request, 'portfolio/contact.html')
