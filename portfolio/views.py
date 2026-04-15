@@ -7,7 +7,7 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 import requests
-import socket
+import resend
 from .models import Project, ContactMessage
 
 def home(request):
@@ -36,29 +36,118 @@ def get_client_ip(request):
     return ip
 
 import socket
+import requests
 
 def send_email_notification(name, email, subject, message):
+    """Send email notification using Resend"""
     try:
-        full_message = f"""
-Name: {name}
-Email: {email}
-Subject: {subject}
-Message: {message}
-"""
-
-        send_mail(
-            subject=f'{subject}',
-            message=full_message,
-            from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[settings.CONTACT_EMAIL],
-            fail_silently=False,   # 👈 IMPORTANT
+        api_key = settings.RESEND_API_KEY
+        
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
+        
+        data = {
+            "from": "onboarding@resend.dev",
+            "to": ["abdullahaleem104@gmail.com"],  # ✅ Changed to your Resend email
+            "subject": f"New Message from Portfolio: {subject}",
+            "html": f"""
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>
+                        body {{
+                            font-family: Arial, sans-serif;
+                            line-height: 1.6;
+                            color: #333;
+                        }}
+                        .container {{
+                            max-width: 600px;
+                            margin: 0 auto;
+                            padding: 20px;
+                            border: 1px solid #ddd;
+                            border-radius: 10px;
+                        }}
+                        .header {{
+                            background-color: #4CAF50;
+                            color: white;
+                            padding: 10px;
+                            text-align: center;
+                            border-radius: 5px;
+                        }}
+                        .content {{
+                            padding: 20px;
+                        }}
+                        .field {{
+                            margin-bottom: 15px;
+                        }}
+                        .label {{
+                            font-weight: bold;
+                            color: #4CAF50;
+                        }}
+                        .message {{
+                            background-color: #f9f9f9;
+                            padding: 15px;
+                            border-radius: 5px;
+                            margin-top: 10px;
+                        }}
+                        .footer {{
+                            text-align: center;
+                            margin-top: 20px;
+                            font-size: 12px;
+                            color: #777;
+                        }}
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h2>📬 New Contact Form Message</h2>
+                        </div>
+                        <div class="content">
+                            <div class="field">
+                                <span class="label">👤 Name:</span> {name}
+                            </div>
+                            <div class="field">
+                                <span class="label">📧 Email:</span> <a href="mailto:{email}">{email}</a>
+                            </div>
+                            <div class="field">
+                                <span class="label">📋 Subject:</span> {subject}
+                            </div>
+                            <div class="field">
+                                <span class="label">💬 Message:</span>
+                                <div class="message">{message}</div>
+                            </div>
+                        </div>
+                        <div class="footer">
+                            <p>This message was sent from your portfolio website contact form.</p>
+                            <p>You can reply directly to: {email}</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            """
+        }
+        
+        response = requests.post(
+            "https://api.resend.com/emails",
+            headers=headers,
+            json=data,
+            timeout=30
         )
-
-        print("EMAIL SENT SUCCESSFULLY")
-        return True
+        
+        print(f"RESEND STATUS: {response.status_code}")
+        print(f"RESEND RESPONSE: {response.text}")
+        
+        if response.status_code == 200:
+            return True
+        else:
+            print(f"Resend error: {response.text}")
+            return False
 
     except Exception as e:
-        print("EMAIL ERROR:", e)
+        print(f"RESEND ERROR: {e}")
         return False
     
 def send_whatsapp_notification(name, email, subject, message):
@@ -70,7 +159,7 @@ def send_whatsapp_notification(name, email, subject, message):
         if whatsapp_api_key and phone_number:
             # Prepare message (URL encode)
             import urllib.parse
-            whatsapp_msg = f"""🔔 NEW CONTACT FORM MESSAGE!🔔
+            whatsapp_msg = f"""🔔 NEW CONTACT FORM MESSAGE!
 
 👤 Name: {name}
 📧 Email: {email}
@@ -81,6 +170,7 @@ def send_whatsapp_notification(name, email, subject, message):
             url = f"https://api.callmebot.com/whatsapp.php?phone={phone_number}&text={encoded_msg}&apikey={whatsapp_api_key}"
             
             response = requests.get(url, timeout=10)
+            print(f"WhatsApp response: {response.status_code}")
             return response.status_code == 200
         
         return False
@@ -128,16 +218,18 @@ def contact(request):
                 ip_address=get_client_ip(request)
             )
             
-            # 2. Send Email
+            # 2. Send Email via Resend
             email_sent = send_email_notification(name, email, subject, message)
             
-            # 3. Send WhatsApp Notification
+            # 3. Send WhatsApp Notification (optional)
             whatsapp_sent = send_whatsapp_notification(name, email, subject, message)
             
-            if email_sent or whatsapp_sent:
+            if email_sent:
                 messages.success(request, '✓ Thank you! Your message has been sent successfully. I\'ll get back to you soon!')
+            elif whatsapp_sent:
+                messages.warning(request, 'Your message was saved but email notification failed. I will still receive your message.')
             else:
-                messages.warning(request, 'Your message was saved but there was an issue with notifications. I will still receive it via email.')
+                messages.warning(request, 'Your message was saved but there was an issue with notifications. I will still review it.')
             
             return redirect('contact')
             

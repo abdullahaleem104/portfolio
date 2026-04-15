@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-(&re9r@3$8mp0s#ycknsg7w9un7+kjo6axnq5-@vp+t&#!&j=i" )
+SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-(&re9r@3$8mp0s#ycknsg7w9un7+kjo6axnq5-@vp+t&#!&j=i")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False  # Change to False in production
@@ -29,15 +29,15 @@ DEBUG = False  # Change to False in production
 ALLOWED_HOSTS = [
     "portfolio-production-4f63.up.railway.app",
     "localhost",
-     ".railway.app",
+    ".railway.app",
     "127.0.0.1"
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://portfolio-production-4f63.up.railway.app"
 ]
-# Application definition
 
+# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -145,24 +145,36 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SITE_ID = 1
 
+# ========== RESEND EMAIL CONFIGURATION ==========
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
 CONTACT_EMAIL = os.environ.get("CONTACT_EMAIL", "abdullahaleem104@gmail.com")
-
-# ========== EMAIL CONFIGURATION ==========
-# For Gmail
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "abdullahaleem104@gmail.com")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "hssg khft kkoz mcwg")
-
-
-# Where to receive contact form emails
-CONTACT_EMAIL = 'abdullahaleem104@gmail.com'  # Replace with your email
 
 # ========== WHATSAPP CONFIGURATION ==========
 # Using CallMeBot (Free)
 # Get your API key from: https://www.callmebot.com/blog/free-api-whatsapp-messages/
-WHATSAPP_API_KEY = ''  # Add your API key here
-WHATSAPP_PHONE_NUMBER = '923101720914'  # Your WhatsApp number with country code (no '+' or spaces)
+WHATSAPP_API_KEY = os.environ.get("WHATSAPP_API_KEY", "")  # Get from Railway env vars
+WHATSAPP_PHONE_NUMBER = os.environ.get("WHATSAPP_PHONE_NUMBER", "923101720914")  # Get from Railway env vars
+
+# Debug mode (set to True temporarily to see errors)
+# You can remove this in production
+if DEBUG:
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'root': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['console'],
+                'level': 'INFO',
+                'propagate': False,
+            },
+        },
+    }
