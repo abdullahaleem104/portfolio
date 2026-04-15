@@ -21,10 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get(
-    "SECRET_KEY",
-    "django-insecure-(&re9r@3$8mp0s#ycknsg7w9un7+kjo6axnq5-@vp+t&#!&j=i"
-)
+SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-(&re9r@3$8mp0s#ycknsg7w9un7+kjo6axnq5-@vp+t&#!&j=i" )
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True  # Change to False in production
@@ -154,8 +151,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "abdullahaleem104@gmail.com")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "hssg khft kkoz mcwg")
+
 
 # Where to receive contact form emails
 CONTACT_EMAIL = 'abdullahaleem104@gmail.com'  # Replace with your email
